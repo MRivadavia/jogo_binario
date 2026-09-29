@@ -1,0 +1,329 @@
+#:import dp kivy.metrics.dp
+
+<PrimaryButton@Button>:
+    background_normal: ''
+    background_color: (0.12, 0.45, 0.80, 1)
+    color: (1, 1, 1, 1)
+    font_size: '19sp'
+    size_hint_y: None
+    height: dp(56)
+
+<BitButton@Button>:
+    background_normal: ''
+    background_color: (0.08, 0.40, 0.72, 1)
+    color: (1, 1, 1, 1)
+    font_size: '44sp'
+    bold: True
+
+<StartScreen>:
+    name: 'start'
+    ScrollView:
+        do_scroll_x: False
+        BoxLayout:
+            orientation: 'vertical'
+            padding: dp(24)
+            spacing: dp(14)
+            size_hint_y: None
+            height: self.minimum_height
+            Label:
+                text: 'BINÁRIO: ACERTO OU ERRE'
+                font_size: '30sp'
+                bold: True
+                color: (0.08, 0.30, 0.55, 1)
+                size_hint_y: None
+                height: dp(72)
+            Label:
+                text: 'Converta o número decimal, bit a bit, e alcance 100 pontos.'
+                color: (0.2, 0.2, 0.2, 1)
+                text_size: self.width, None
+                halign: 'center'
+                size_hint_y: None
+                height: dp(54)
+            TextInput:
+                id: student_name
+                hint_text: 'Nome do estudante'
+                multiline: False
+                size_hint_y: None
+                height: dp(52)
+                font_size: '18sp'
+            TextInput:
+                id: class_name
+                hint_text: 'Turma (ex.: 61)'
+                multiline: False
+                size_hint_y: None
+                height: dp(52)
+                font_size: '18sp'
+            Label:
+                text: 'Modo de jogo'
+                color: (0.15, 0.15, 0.15, 1)
+                size_hint_y: None
+                height: dp(28)
+            Spinner:
+                id: mode_spinner
+                text: 'Treinamento'
+                values: ('Aprendizagem', 'Treinamento', 'Desafio')
+                size_hint_y: None
+                height: dp(52)
+                font_size: '18sp'
+            Label:
+                text: 'Aprendizagem mostra os pesos. Desafio usa 10 s por bit.'
+                color: (0.35, 0.35, 0.35, 1)
+                text_size: self.width, None
+                halign: 'center'
+                size_hint_y: None
+                height: dp(46)
+            BoxLayout:
+                size_hint_y: None
+                height: dp(48)
+                spacing: dp(10)
+                ToggleButton:
+                    id: sound_toggle
+                    text: 'Som'
+                    state: 'down'
+                    group: None
+                ToggleButton:
+                    id: vibration_toggle
+                    text: 'Vibração'
+                    state: 'down'
+                    group: None
+            Label:
+                id: start_message
+                text: ''
+                color: (0.8, 0.1, 0.1, 1)
+                size_hint_y: None
+                height: dp(30)
+            PrimaryButton:
+                text: 'COMEÇAR'
+                on_release: root.start_game()
+            Button:
+                text: 'Histórico de partidas'
+                size_hint_y: None
+                height: dp(52)
+                on_release: app.go_history()
+
+<GameScreen>:
+    name: 'game'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(18)
+        spacing: dp(10)
+        BoxLayout:
+            size_hint_y: None
+            height: dp(34)
+            Label:
+                id: mode_label
+                text: 'Modo'
+                color: (0.2, 0.2, 0.2, 1)
+                halign: 'left'
+                text_size: self.size
+            Label:
+                text: 'Meta: 100'
+                color: (0.2, 0.2, 0.2, 1)
+                halign: 'right'
+                text_size: self.size
+        Label:
+            text: 'PONTUAÇÃO'
+            color: (0.35, 0.35, 0.35, 1)
+            size_hint_y: None
+            height: dp(24)
+        Label:
+            id: score_label
+            text: '0 / 100'
+            font_size: '24sp'
+            bold: True
+            color: (0.08, 0.35, 0.62, 1)
+            size_hint_y: None
+            height: dp(34)
+        ProgressBar:
+            id: progress
+            max: 100
+            value: 0
+            size_hint_y: None
+            height: dp(16)
+        Widget:
+            size_hint_y: None
+            height: dp(6)
+        Label:
+            text: 'NÚMERO DECIMAL'
+            color: (0.35, 0.35, 0.35, 1)
+            size_hint_y: None
+            height: dp(28)
+        Label:
+            id: decimal_label
+            text: '173'
+            font_size: '62sp'
+            bold: True
+            color: (0.06, 0.25, 0.45, 1)
+            size_hint_y: None
+            height: dp(82)
+        Label:
+            id: weights_label
+            text: ''
+            color: (0.3, 0.3, 0.3, 1)
+            font_size: '15sp'
+            text_size: self.width, None
+            halign: 'center'
+            size_hint_y: None
+            height: dp(34) if self.text else 0
+        Label:
+            text: 'BINÁRIO'
+            color: (0.35, 0.35, 0.35, 1)
+            size_hint_y: None
+            height: dp(26)
+        Label:
+            id: answer_label
+            text: '_  _  _  _'
+            font_size: '34sp'
+            bold: True
+            color: (0.08, 0.28, 0.50, 1)
+            text_size: self.width, None
+            halign: 'center'
+            size_hint_y: None
+            height: dp(56)
+        Label:
+            id: position_label
+            text: 'Dígito 1 de 4'
+            color: (0.3, 0.3, 0.3, 1)
+            size_hint_y: None
+            height: dp(28)
+        BoxLayout:
+            size_hint_y: None
+            height: dp(46) if root.timer_visible else 0
+            opacity: 1 if root.timer_visible else 0
+            Label:
+                text: 'Tempo do bit:'
+                color: (0.25, 0.25, 0.25, 1)
+            ProgressBar:
+                max: 10
+                value: root.timer_value
+            Label:
+                text: '{:.1f} s'.format(root.timer_value)
+                color: (0.25, 0.25, 0.25, 1)
+                size_hint_x: .35
+        Label:
+            id: feedback
+            text: 'Escolha 0 ou 1.'
+            color: (0.15, 0.15, 0.15, 1)
+            text_size: self.width, None
+            halign: 'center'
+            size_hint_y: None
+            height: dp(54)
+        BoxLayout:
+            spacing: dp(14)
+            size_hint_y: None
+            height: dp(100)
+            BitButton:
+                text: '0'
+                on_release: root.press_bit('0')
+            BitButton:
+                text: '1'
+                on_release: root.press_bit('1')
+        Widget:
+        Button:
+            text: 'Encerrar partida e gerar relatório'
+            size_hint_y: None
+            height: dp(46)
+            on_release: app.end_session_early()
+
+<ReportScreen>:
+    name: 'report'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(14)
+        spacing: dp(8)
+        Label:
+            text: 'RELATÓRIO DA PARTIDA'
+            font_size: '25sp'
+            bold: True
+            color: (0.08, 0.30, 0.55, 1)
+            size_hint_y: None
+            height: dp(42)
+        Label:
+            id: report_title
+            text: ''
+            bold: True
+            color: (0.2, 0.2, 0.2, 1)
+            size_hint_y: None
+            height: dp(32)
+        Label:
+            id: report_summary
+            text: ''
+            color: (0.15, 0.15, 0.15, 1)
+            text_size: self.width, None
+            halign: 'center'
+            valign: 'middle'
+            size_hint_y: None
+            height: dp(84)
+        Label:
+            id: opinion_label
+            text: ''
+            color: (0.18, 0.18, 0.18, 1)
+            text_size: self.width, None
+            halign: 'left'
+            valign: 'top'
+            size_hint_y: None
+            height: min(dp(155), max(dp(80), self.texture_size[1] + dp(12)))
+        Label:
+            id: report_path
+            text: ''
+            color: (0.4, 0.4, 0.4, 1)
+            font_size: '12sp'
+            text_size: self.width, None
+            halign: 'center'
+            size_hint_y: None
+            height: dp(42)
+        ScrollView:
+            do_scroll_x: False
+            Label:
+                id: report_body
+                text: ''
+                color: (0.12, 0.12, 0.12, 1)
+                text_size: self.width - dp(18), None
+                size_hint_y: None
+                height: self.texture_size[1] + dp(24)
+                valign: 'top'
+        BoxLayout:
+            spacing: dp(8)
+            size_hint_y: None
+            height: dp(52)
+            Button:
+                text: 'Jogar novamente'
+                on_release: root.replay()
+            Button:
+                text: 'Histórico'
+                on_release: app.go_history()
+            Button:
+                text: 'Início'
+                on_release: app.go_home()
+
+<HistoryScreen>:
+    name: 'history'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: dp(14)
+        spacing: dp(8)
+        Label:
+            text: 'HISTÓRICO DE PARTIDAS'
+            font_size: '25sp'
+            bold: True
+            color: (0.08, 0.30, 0.55, 1)
+            size_hint_y: None
+            height: dp(48)
+        Label:
+            text: 'Toque em uma partida para abrir o relatório completo.'
+            color: (0.3, 0.3, 0.3, 1)
+            size_hint_y: None
+            height: dp(34)
+        ScrollView:
+            do_scroll_x: False
+            BoxLayout:
+                id: history_box
+                orientation: 'vertical'
+                spacing: dp(8)
+                size_hint_y: None
+                height: self.minimum_height
+        Button:
+            text: 'Voltar'
+            size_hint_y: None
+            height: dp(52)
+            on_release: app.go_home()
